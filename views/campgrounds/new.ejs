@@ -1,24 +1,15 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>New Campground</title>
-</head>
-<body>
-    <form action="/campgrounds" method="post">
-        <div>
-            <label for="title">Title</label>
-            <!-- ! used [] just to group things under campgrounds, req.body will look like {campground:{title: asda, location: asdad}}  -->
-            <!-- ! Rather than just {title:asda, location: asdas} -->
-            <input type="text" name="campground[title]" id="title">
-        </div>
-        <div>
-            <label for="location">Location</label>
-            <input type="text" name="campground[location]" id="location">
-        </div>
-        <button>Add Campground</button>
-    </form>
-    <a href="/campgrounds">All Campgrounds</a>
-</body>
-</html>
+<% layout('layouts/boilerplate') %>
+<form action="/campgrounds" method="post">
+    <div>
+        <label for="title">Title</label>
+        <!-- ! used [] just to group things under campgrounds, req.body will look like {campground:{title: asda, location: asdad}}  -->
+        <!-- ! Rather than just {title:asda, location: asdas} -->
+        <input type="text" name="campground[title]" id="title">
+    </div>
+    <div>
+        <label for="location">Location</label>
+        <input type="text" name="campground[location]" id="location">
+    </div>
+    <button>Add Campground</button>
+</form>
+<a href="/campgrounds">All Campgrounds</a>
