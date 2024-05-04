@@ -5,7 +5,6 @@ const mongoose = require('mongoose')
 const ejsMate = require('ejs-mate')
 const methodOverride = require('method-override')
 const Campground = require('./models/campground')
-const campground = require('./models/campground')
 mongoose.connect('mongodb://127.0.0.1:27017/yelp-camp')
 
 
@@ -24,10 +23,6 @@ app.use(express.urlencoded({extended:true}))
 app.use(methodOverride('_method'))
 
 //* Home Page and show all campgrounds
-app.get('/', async (req, res) =>{
-    res.render('home')
-})
-
 app.get('/campgrounds', async (req, res) =>{
     const campgrounds = await Campground.find({})
     res.render('campgrounds/index', {campgrounds})
