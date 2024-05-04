@@ -1,12 +1,10 @@
 <!--! I want this html to be used in layouts/boilerplate ejs file   -->
 <% layout('layouts/boilerplate') %>
-<h1>Heres the details for <%= campground.title %>
-</h1>
-<ul>
-    <li>
-        Location: <%= campground.location %>
-    </li>
-</ul>
+<h1>Heres the details for <%= campground.title %></h1>
+<h1><%= campground.location%></h1>
+<img src="<%= campground.image  %>" alt="campground image" width="500px" height="500px">
+<p><%= campground.description  %></p>
+
 <p>
 
     <a href="/campgrounds/<%=campground._id  %>/edit">Edit</a>
