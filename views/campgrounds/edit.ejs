@@ -1,28 +1,40 @@
 <!--! I want this html to be used in layouts/boilerplate ejs file   -->
 <% layout('layouts/boilerplate') %>
 
-<h1>Editing <%= campground.title%></h1>
-<form action="/campgrounds/<%=campground._id%>?_method=PUT" method="post">
 
+<div class="row">
+    <div class="col-6 offset-3">
+        
+        <h1>Editing <%= campground.title%></h1>
+        <form action="/campgrounds/<%=campground._id%>?_method=PUT" method="post">
+        
+        
+            <div class="mb-3"> 
+                <label class="form-label" for="title">Title</label>
+                <input class="form-control" type="text" name="campground[title]" id="title" value="<%= campground.title  %>">
+            </div>
+            <div class="mb-3">
+                <label class="form-label" for="location">Location</label>
+                <input class="form-control" type="text" name="campground[location]" id="location" value="<%= campground.location  %>">
+            </div>
+            <div class="mb-3">
+                <label class="form-label" for="price">Campground Price</label>
+                <div class="input-group">
+                    <span class="input-group-text" id="price-label">$</span>
+                    <input class="form-control" type="text" name="campground[price]" id="price" value="<%= campground.price  %>">
+                </div>
+            </div>
+            <div class="mb-3">
+                <label class="form-label" for="Description">Description</label>
+                <textarea class="form-control" type="text" name="campground[Description]" id="Description"><%=campground.description%></textarea>
+            </div>
+            <div class="mb-3">
 
-    <div>
-        <label for="title">Title</label>
-        <input type="text" name="campground[title]" id="title" value="<%= campground.title  %>">
+                <button class="btn btn-primary">
+                    Apply Changes
+                </button>
+            </div>
+        </form>
+        <a href="/campgrounds/<%=campground._id  %>">Back to Campground</a>
     </div>
-    <div>
-        <label for="price">Price</label>
-        <input type="text" name="campground[price]" id="price" >
-    </div>
-    <div>
-        <label for="location">Location</label>
-        <input type="text" name="campground[location]" id="location" value="<%= campground.location  %>">
-    </div>
-    <div>
-        <label for="Description">Description</label>
-        <input type="text" name="campground[Description]" id="Description">
-    </div>
-    <button>
-        Apply Changes
-    </button>
-</form>
-<a href="/campgrounds/<%=campground._id  %>">Back to Campground</a>
+</div>
