@@ -22,51 +22,71 @@ app.set('views', path.join(__dirname, 'views'))
 app.use(express.urlencoded({extended:true}))
 app.use(methodOverride('_method'))
 
+
+//* Wrapper function to catch errors for async
+
+function wrapAsync(func){
+    return function(req, res, next){
+        func(req, res, next).catch(err => next(err))
+    }
+}
+
+app.get('/', (req, res)=>{
+    res.redirect('/campgrounds')
+})
+
 //* Home Page and show all campgrounds
-app.get('/campgrounds', async (req, res) =>{
+app.get('/campgrounds', wrapAsync(async (req, res) =>{
     const campgrounds = await Campground.find({})
     res.render('campgrounds/index', {campgrounds})
-})
+}))
 
 //* Add a new campground
 app.get('/campgrounds/new', (req, res) =>{
     res.render('campgrounds/new')
 })
 
-app.post('/campgrounds', async (req, res) =>{
+app.post('/campgrounds', wrapAsync(async (req, res) =>{
     const campground =  new Campground(req.body.campground)
     await campground.save()
     res.redirect(`/campgrounds/${campground._id}`)
-})
+}))
 
 //* Show campgrounds details
-app.get('/campgrounds/:id', async (req, res) =>{
+app.get('/campgrounds/:id', wrapAsync(async (req, res) =>{
     const id = req.params.id
     const campground = await Campground.findById(id)
     
     res.render('campgrounds/details', {campground})
-})
+}))
 
 
 //* Edit campgrounds
-app.get('/campgrounds/:id/edit',  async (req, res) =>{
+app.get('/campgrounds/:id/edit', wrapAsync(async (req, res) =>{
     const id = req.params.id
     const campground = await Campground.findById(id)
     res.render('campgrounds/edit', {campground})
-})
+}))
 
-app.put('/campgrounds/:id', async (req, res) =>{
+app.put('/campgrounds/:id', wrapAsync(async (req, res) =>{
     const id = req.params.id
     const campground = await Campground.findByIdAndUpdate(id, {...req.body.campground})
     res.redirect(`/campgrounds/${id}`)
-})
+}))
 
 
 //* Delete campground
-app.delete('/campgrounds/:id', async (req, res) =>{
+app.delete('/campgrounds/:id', wrapAsync(async (req, res) =>{
     const id = req.params.id
     const campground = await Campground.findByIdAndDelete(id)
     res.redirect('/campgrounds')
+}))
+
+//* Error Middleware
+
+app.use((err, req, res, next) =>{
+    res.send(`ERROR MIDDLEWARE: Error: ${err}`)
+
 })
 
 app.listen(8000, () =>{
