@@ -1,6 +1,7 @@
 const express = require('express')
 const app = express()
 const path = require('path')
+const AppError = require('./errorHandler')
 const mongoose = require('mongoose')
 const ejsMate = require('ejs-mate')
 const methodOverride = require('method-override')
@@ -56,6 +57,9 @@ app.post('/campgrounds', wrapAsync(async (req, res) =>{
 app.get('/campgrounds/:id', wrapAsync(async (req, res) =>{
     const id = req.params.id
     const campground = await Campground.findById(id)
+    if(!campground){
+        throw new AppError("Could not Find Campground", 401)
+    }
     
     res.render('campgrounds/details', {campground})
 }))
@@ -85,7 +89,8 @@ app.delete('/campgrounds/:id', wrapAsync(async (req, res) =>{
 //* Error Middleware
 
 app.use((err, req, res, next) =>{
-    res.send(`ERROR MIDDLEWARE: Error: ${err}`)
+    console.log(`ERROR MIDDLEWARE: Error: ${err.message}`)
+    res.status(err.status).send(`${err.message}`)
 
 })
 
