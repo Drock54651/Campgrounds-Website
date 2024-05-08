@@ -32,11 +32,12 @@ function wrapAsync(func){
     }
 }
 
+
+//* Home Page and show all campgrounds
 app.get('/', (req, res)=>{
     res.redirect('/campgrounds')
 })
 
-//* Home Page and show all campgrounds
 app.get('/campgrounds', wrapAsync(async (req, res) =>{
     const campgrounds = await Campground.find({})
     res.render('campgrounds/index', {campgrounds})
@@ -74,7 +75,7 @@ app.get('/campgrounds/:id/edit', wrapAsync(async (req, res) =>{
 
 app.put('/campgrounds/:id', wrapAsync(async (req, res) =>{
     const id = req.params.id
-    const campground = await Campground.findByIdAndUpdate(id, {...req.body.campground})
+    const campground = await Campground.findByIdAndUpdate(id, {...req.body.campground}, {runValidators: true})
     res.redirect(`/campgrounds/${id}`)
 }))
 
@@ -87,10 +88,11 @@ app.delete('/campgrounds/:id', wrapAsync(async (req, res) =>{
 }))
 
 //* Error Middleware
-
 app.use((err, req, res, next) =>{
-    console.log(`ERROR MIDDLEWARE: Error: ${err.message}`)
-    res.status(err.status).send(`${err.message}`)
+    console.log(err.name)
+    const {status = 500, message = "Something Went Wrong"} = err
+    console.log(`ERROR MIDDLEWARE: Error: ${message}`)
+    res.status(status).send(`${message}`)
 
 })
 
