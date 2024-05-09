@@ -58,7 +58,7 @@ app.post('/campgrounds', wrapAsync(async (req, res) =>{
         }).required() //! campground object itself must also be required since thats where the data is stored to be used
     })
 
-    const {error} = campgroundSchema.validate(req.body)
+    const {error} = campgroundSchema.validate(req.body) //! Checks to see if req.body matches the schema, if not, will produce object with error field
     if(error){
         const message = error.details.map(el => el.message).join(',') //! error.details is an array of objects
         throw new AppError(message, 400)
