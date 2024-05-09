@@ -81,7 +81,13 @@ app.delete('/campgrounds/:id', wrapAsync(async (req, res) =>{
     res.redirect('/campgrounds')
 }))
 
-//* Error Middleware
+
+//* Error Middleware/Handling
+app.all('*', (req, res, next) =>{
+    next(new AppError('Page Not Found', 404))
+})
+
+
 app.use((err, req, res, next) =>{
     console.log(err.name)
     const {status = 500, message = "Something Went Wrong"} = err
