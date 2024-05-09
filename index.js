@@ -1,13 +1,15 @@
 const express = require('express')
 const app = express()
 const path = require('path')
-const AppError = require('./errorHandler')
 const mongoose = require('mongoose')
 const ejsMate = require('ejs-mate')
 const methodOverride = require('method-override')
 const Campground = require('./models/campground')
 mongoose.connect('mongodb://127.0.0.1:27017/yelp-camp')
 
+//! Imports from other files
+const AppError = require('./utils/errorHandler')
+const wrapAsync = require('./utils/wrapAsync')
 
 
 const db = mongoose.connection;
@@ -23,14 +25,6 @@ app.set('views', path.join(__dirname, 'views'))
 app.use(express.urlencoded({extended:true}))
 app.use(methodOverride('_method'))
 
-
-//* Wrapper function to catch errors for async
-
-function wrapAsync(func){
-    return function(req, res, next){
-        func(req, res, next).catch(err => next(err))
-    }
-}
 
 
 //* Home Page and show all campgrounds
