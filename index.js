@@ -3,6 +3,7 @@ const app = express()
 const path = require('path')
 const mongoose = require('mongoose')
 const ejsMate = require('ejs-mate')
+const Joi = require('joi')
 const methodOverride = require('method-override')
 const Campground = require('./models/campground')
 mongoose.connect('mongodb://127.0.0.1:27017/yelp-camp')
@@ -43,9 +44,26 @@ app.get('/campgrounds/new', (req, res) =>{
 })
 
 app.post('/campgrounds', wrapAsync(async (req, res) =>{
-    if(!req.body.campground){
-        throw new AppError("Invalid Campground Data", 400)
+    // if(!req.body.campground){
+    //     throw new AppError("Invalid Campground Data", 400)
+    // }
+    //! Reminder that the req.body object has an object campground. Joi can be used to validate the fields within the campground object
+    const campgroundSchema = Joi.object({
+        campground: Joi.object({
+            title: Joi.string().required(),
+            price: Joi.number().required().min(0),
+            location: Joi.string().required(),
+            description: Joi.string().required(),
+            image: Joi.string().required()
+        }).required() //! campground object itself must also be required since thats where the data is stored to be used
+    })
+
+    const {error} = campgroundSchema.validate(req.body)
+    if(error){
+        const message = error.details.map(el => el.message).join(',') //! error.details is an array of objects
+        throw new AppError(message, 400)
     }
+
     const campground =  new Campground(req.body.campground)
     await campground.save()
     res.redirect(`/campgrounds/${campground._id}`)
