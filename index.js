@@ -43,6 +43,9 @@ app.get('/campgrounds/new', (req, res) =>{
 })
 
 app.post('/campgrounds', wrapAsync(async (req, res) =>{
+    if(!req.body.campground){
+        throw new AppError("Invalid Campground Data", 400)
+    }
     const campground =  new Campground(req.body.campground)
     await campground.save()
     res.redirect(`/campgrounds/${campground._id}`)
@@ -92,7 +95,11 @@ app.use((err, req, res, next) =>{
     console.log(err.name)
     const {status = 500, message = "Something Went Wrong"} = err
     console.log(`ERROR MIDDLEWARE: Error: ${message}`)
-    res.status(status).send(`${message}`)
+    // res.status(status).send(`${message}`)
+    if(!err.message){
+        err.message = "Something Went Wrong!"
+    }
+    res.render('error', {err})
 
 })
 
