@@ -3,7 +3,6 @@ const app = express()
 const path = require('path')
 const mongoose = require('mongoose')
 const ejsMate = require('ejs-mate')
-const Joi = require('joi')
 const methodOverride = require('method-override')
 const Campground = require('./models/campground')
 mongoose.connect('mongodb://127.0.0.1:27017/yelp-camp')
@@ -11,6 +10,7 @@ mongoose.connect('mongodb://127.0.0.1:27017/yelp-camp')
 //! Imports from other files
 const AppError = require('./utils/errorHandler')
 const wrapAsync = require('./utils/wrapAsync')
+const {campgroundSchema} = require('./schemas.js')
 
 
 const db = mongoose.connection;
@@ -26,7 +26,16 @@ app.set('views', path.join(__dirname, 'views'))
 app.use(express.urlencoded({extended:true}))
 app.use(methodOverride('_method'))
 
+//* Middleware for specific routes
+const validateCampground = (req, res, next) =>{
+    const {error} = campgroundSchema.validate(req.body) //! Checks to see if req.body matches the schema, if not, will produce object with error field
+    if(error){
+        const message = error.details.map(el => el.message).join(',') //! error.details is an array of objects
+        throw new AppError(message, 400)
+    }
 
+    next()
+}
 
 //* Home Page and show all campgrounds
 app.get('/', (req, res)=>{
@@ -43,27 +52,7 @@ app.get('/campgrounds/new', (req, res) =>{
     res.render('campgrounds/new')
 })
 
-app.post('/campgrounds', wrapAsync(async (req, res) =>{
-    // if(!req.body.campground){
-    //     throw new AppError("Invalid Campground Data", 400)
-    // }
-    //! Reminder that the req.body object has an object campground. Joi can be used to validate the fields within the campground object
-    const campgroundSchema = Joi.object({
-        campground: Joi.object({
-            title: Joi.string().required(),
-            price: Joi.number().required().min(0),
-            location: Joi.string().required(),
-            description: Joi.string().required(),
-            image: Joi.string().required()
-        }).required() //! campground object itself must also be required since thats where the data is stored to be used
-    })
-
-    const {error} = campgroundSchema.validate(req.body) //! Checks to see if req.body matches the schema, if not, will produce object with error field
-    if(error){
-        const message = error.details.map(el => el.message).join(',') //! error.details is an array of objects
-        throw new AppError(message, 400)
-    }
-
+app.post('/campgrounds', validateCampground, wrapAsync(async (req, res) =>{
     const campground =  new Campground(req.body.campground)
     await campground.save()
     res.redirect(`/campgrounds/${campground._id}`)
@@ -88,7 +77,7 @@ app.get('/campgrounds/:id/edit', wrapAsync(async (req, res) =>{
     res.render('campgrounds/edit', {campground})
 }))
 
-app.put('/campgrounds/:id', wrapAsync(async (req, res) =>{
+app.put('/campgrounds/:id', validateCampground, wrapAsync(async (req, res) =>{
     const id = req.params.id
     const campground = await Campground.findByIdAndUpdate(id, {...req.body.campground}, {runValidators: true})
     res.redirect(`/campgrounds/${id}`)
